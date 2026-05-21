@@ -23,5 +23,5 @@ export interface IIssueQuery {
 } 
 export interface IssueRequester {
   id: number;
-  role: string;
-};
+  role: "contributor" | "maintainer";
+}

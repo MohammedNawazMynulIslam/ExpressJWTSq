@@ -1,38 +1,53 @@
 import type { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { getErrorMessage } from "../../utils/appError";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../../utils/sendResponse";
 import { authService } from "./auth.service";
 
-const registerUser = async (req: Request, res: Response) => {
+type RegisterUserBody = {
+  name: string;
+  email: string;
+  password: string;
+  role?: "contributor" | "maintainer";
+};
+
+type LoginUserBody = {
+  email: string;
+  password: string;
+};
+
+const registerUser = async (
+  req: Request<unknown, unknown, RegisterUserBody>,
+  res: Response,
+) => {
   try {
     const result = await authService.registerUserIntoDB(req.body);
-    res.status(201).json({
-      success: true,
+    sendSuccessResponse(res, StatusCodes.CREATED, {
       message: "User registered successfully",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(400).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
-    });
+    sendErrorResponse(res, StatusCodes.BAD_REQUEST, getErrorMessage(error));
   }
 };
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = async (
+  req: Request<unknown, unknown, LoginUserBody>,
+  res: Response,
+) => {
   const { email, password } = req.body;
+
   try {
-   
     const result = await authService.loginUserFromDB({ email, password });
-    res.status(200).json({
-      success: true,
+    sendSuccessResponse(res, StatusCodes.OK, {
       message: "Login successful",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(401).json({
-      success: false,
-      message: error instanceof Error ? error.message : "Invalid credentials",
-    });
+    sendErrorResponse(res, StatusCodes.UNAUTHORIZED, getErrorMessage(error));
   }
 };
 
