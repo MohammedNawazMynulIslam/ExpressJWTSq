@@ -74,11 +74,15 @@ const getIssueById = async (req: Request, res: Response) => {
   }
 };
 
-const updateIssue = async (req: Request, res: Response) => {
+const updateIssue = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
 
   try {
-    const result = await issueService.updateIssueInDB(String(id), req.body);
+    const result = await issueService.updateIssueInDB(
+      String(id),
+      req.body,
+      req.user!,
+    );
 
     if (!result) {
       return res.status(404).json({
@@ -92,10 +96,13 @@ const updateIssue = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: unknown) {
-    res.status(400).json({
+    const message =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+    const statusCode = message === "You are not allowed to update this issue" ? 403 : 400;
+
+    res.status(statusCode).json({
       success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      message,
       error: error,
     });
   }

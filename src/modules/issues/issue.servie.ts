@@ -1,6 +1,10 @@
 import { pool } from "../../db";
 import type { IIssue, IIssueQuery } from "./issue.interface";
 
+type IssueRequester = {
+  id: number;
+  role: string;
+};
 
 const getReporterById = async (reporterId: number) => {
   const result = await pool.query(
@@ -97,20 +101,44 @@ const getIssueByIdFromDB = async (id: string) => {
 
 const updateIssueInDB = async (
   id: string,
-  payload: Partial<Pick<IIssue, "title" | "description" | "type" | "status">>,
+  payload: Partial<Pick<IIssue, "title" | "description" | "type">>,
+  requester: IssueRequester,
 ) => {
-  const { title, description, type, status } = payload;
+  const { title, description, type } = payload;
+
+  if (!title && !description && !type) {
+    throw new Error("At least one of title, description, or type is required");
+  }
+
+  if (type && !["bug", "feature_request"].includes(type)) {
+    throw new Error("Invalid type value");
+  }
+
+  const existingIssue = await pool.query(
+    `SELECT id, reporter_id, status FROM issues WHERE id = $1`,
+    [id],
+  );
+
+  if (existingIssue.rows.length === 0) return null;
+
+  const issue = existingIssue.rows[0];
+  const isMaintainer = requester.role === "maintainer";
+  const isOwnIssue = issue.reporter_id === requester.id;
+  const isOpenIssue = issue.status === "open";
+
+  if (!isMaintainer && (!isOwnIssue || !isOpenIssue)) {
+    throw new Error("You are not allowed to update this issue");
+  }
 
   const result = await pool.query(
     `UPDATE issues
      SET title       = COALESCE($1, title),
          description = COALESCE($2, description),
          type        = COALESCE($3, type),
-         status      = COALESCE($4, status),
          updated_at  = NOW()
-     WHERE id = $5
+     WHERE id = $4
      RETURNING id, title, description, type, status, reporter_id, created_at, updated_at`,
-    [title, description, type, status, id],
+    [title, description, type, id],
   );
 
   return result.rows[0] ?? null;
