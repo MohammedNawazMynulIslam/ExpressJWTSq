@@ -16,17 +16,7 @@ const createUserIntoDB = async (payload: Issue) => {
   return result;
 };
 
-const loginUserFromDB = async (email: string, password: string) => {
-  const result = await pool.query(
-    `
-      SELECT id, name, email, role, created_at, updated_at
-      FROM users
-      WHERE email = $1 AND password = $2
-      `,
-    [email, password],
-  );
-  return result;
-};
+
 const createIssueIntoDB = async (payload: Issue) => {
   const { title, description, type, reporter_id } = payload;
   const result = await pool.query(
@@ -98,5 +88,5 @@ export const issueService = {
   updateIssueInDB,
   deleteIssueFromDB,
   createUserIntoDB,
-  loginUserFromDB,
+  
 };

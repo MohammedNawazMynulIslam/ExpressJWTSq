@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { issueController } from "./issues.controller";
-
+import { verifyToken } from "../../middleware/auth"; 
 const router = Router();
-router.post("/", issueController.createUser);
-router.post("/", issueController.loginUser);
-router.post("/", issueController.createIssue);
+
+router.post("/", verifyToken, issueController.createIssue);
 router.get("/", issueController.getAllIssues);
 router.get("/:id", issueController.getIssueById);
-router.patch("/:id", issueController.updateIssue);
-router.delete("/:id", issueController.deleteIssue);
+router.patch("/:id", verifyToken, issueController.updateIssue);
+router.delete("/:id", verifyToken, issueController.deleteIssue);
 
 export const issueRouter = router;

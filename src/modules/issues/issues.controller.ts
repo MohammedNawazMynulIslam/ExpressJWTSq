@@ -11,30 +11,6 @@ const createUser = async (req: Request, res: Response) => {
     });
   } catch (error: unknown) {
     res.status(400).json({
-      success: true,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
-      error: error,
-    });
-  }
-};
-const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  try {
-    const result = await issueService.loginUserFromDB(email, password);
-    if (result.rows.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      data: result.rows[0],
-    });
-  } catch (error: unknown) {
-    res.status(500).json({
       success: false,
       message:
         error instanceof Error ? error.message : "An unexpected error occurred",
@@ -42,6 +18,7 @@ const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const createIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.createIssueIntoDB(req.body);
@@ -162,5 +139,5 @@ export const issueController = {
   updateIssue,
   deleteIssue,
   createUser,
-  loginUser,
+ 
 };
