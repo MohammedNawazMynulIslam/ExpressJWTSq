@@ -108,10 +108,10 @@ const updateIssue = async (req: AuthRequest, res: Response) => {
   }
 };
 
-const deleteIssue = async (req: Request, res: Response) => {
+const deleteIssue = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   try {
-    const result = await issueService.deleteIssueFromDB(String(id));
+    const result = await issueService.deleteIssueFromDB(String(id), req.user!);
     if (!result) {
       return res.status(404).json({
         success: false,
@@ -123,10 +123,13 @@ const deleteIssue = async (req: Request, res: Response) => {
       message: "Issue deleted successfully",
     });
   } catch (error: unknown) {
-    res.status(500).json({
+    const message =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+    const statusCode = message === "Only maintainers can delete issues" ? 403 : 500;
+
+    res.status(statusCode).json({
       success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      message,
       error: error,
     });
   }

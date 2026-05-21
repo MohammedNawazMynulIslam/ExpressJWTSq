@@ -1,10 +1,5 @@
 import { pool } from "../../db";
-import type { IIssue, IIssueQuery } from "./issue.interface";
-
-type IssueRequester = {
-  id: number;
-  role: string;
-};
+import type { IIssue, IIssueQuery, IssueRequester } from "./issue.interface";
 
 const getReporterById = async (reporterId: number) => {
   const result = await pool.query(
@@ -145,7 +140,11 @@ const updateIssueInDB = async (
 };
 
 
-const deleteIssueFromDB = async (id: string) => {
+const deleteIssueFromDB = async (id: string, requester: IssueRequester) => {
+  if (requester.role !== "maintainer") {
+    throw new Error("Only maintainers can delete issues");
+  }
+
   const result = await pool.query(
     `DELETE FROM issues WHERE id = $1 RETURNING id`,
     [id],

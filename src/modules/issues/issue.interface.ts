@@ -20,4 +20,8 @@ export interface IIssueQuery {
   sort?: "newest" | "oldest" | undefined;
   type?: "bug" | "feature_request" | undefined;
   status?: "open" | "in_progress" | "resolved" | undefined;
-}
+} 
+export interface IssueRequester {
+  id: number;
+  role: string;
+};
