@@ -17,7 +17,7 @@ export interface IIssue {
 
 // issue.interface.ts
 export interface IIssueQuery {
-  sort?: string | undefined;    
-  type?: string | undefined;
-  status?: string | undefined;
+  sort?: "newest" | "oldest" | undefined;
+  type?: "bug" | "feature_request" | undefined;
+  status?: "open" | "in_progress" | "resolved" | undefined;
 }

@@ -30,9 +30,18 @@ const createIssueIntoDB = async (
 const getAllIssuesFromDB = async (query: IIssueQuery) => {
   const { sort, type, status } = query;
 
-  const sortOrder = sort === "oldest" ? "ASC" : "DESC"; // ✅ correct mapping
+  if (sort && !["newest", "oldest"].includes(sort)) {
+    throw new Error("Invalid sort value");
+  }
+  if (type && !["bug", "feature_request"].includes(type)) {
+    throw new Error("Invalid type value");
+  }
+  if (status && !["open", "in_progress", "resolved"].includes(status)) {
+    throw new Error("Invalid status value");
+  }
 
-  // ✅ build dynamic WHERE clause safely
+  const sortOrder = sort === "oldest" ? "ASC" : "DESC"; 
+
   const conditions: string[] = [];
   const values: string[] = [];
 
@@ -52,7 +61,7 @@ const getAllIssuesFromDB = async (query: IIssueQuery) => {
     `SELECT id, title, description, type, status, reporter_id, created_at, updated_at
      FROM issues
      ${whereClause}
-     ORDER BY created_at ${sortOrder}`,
+     ORDER BY created_at ${sortOrder}, id ${sortOrder}`,
     values,
   );
 

@@ -22,12 +22,16 @@ const createIssue = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
 const getAllIssues = async (req: Request, res: Response) => {
-  
+  const sort = req.query.sort as IIssueQuery["sort"] | undefined;
+  const type = req.query.type as IIssueQuery["type"] | undefined;
+  const status = req.query.status as IIssueQuery["status"] | undefined;
+
   const query: IIssueQuery = {
-    sort: req.query.sort as string | undefined,
-    type: req.query.type as string | undefined,
-    status: req.query.status as string | undefined,
+    sort,
+    type,
+    status,
   };
 
   try {
