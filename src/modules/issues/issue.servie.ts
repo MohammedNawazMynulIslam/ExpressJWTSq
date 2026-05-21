@@ -1,84 +1,120 @@
 import { pool } from "../../db";
-import type { Issue } from "./issue.interface";
-import bcrypt from "bcrypt";
+import type { IIssue, IIssueQuery } from "./issue.interface";
 
-const createUserIntoDB = async (payload: Issue) => {
-  const { name, email, password, role } = payload;
-  const hashedPassword = await bcrypt.hash(password, 12);
+
+const getReporterById = async (reporterId: number) => {
   const result = await pool.query(
-    `
-    INSERT INTO users (name, email, password, role)
-    VALUES ($1,$2,$3,$4) 
-    RETURNING id, name, email, role, created_at, updated_at
-    `,
-    [name, email, hashedPassword, role],
+    `SELECT id, name, role FROM users WHERE id = $1`,
+    [reporterId],
   );
-  return result;
+  return result.rows[0] ?? null;
+};
+
+const createIssueIntoDB = async (
+  payload: Pick<IIssue, "title" | "description" | "type">,
+  reporterId: number, // ✅ comes from JWT, not body
+) => {
+  const { title, description, type } = payload;
+
+  const result = await pool.query(
+    `INSERT INTO issues (title, description, type, reporter_id)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id, title, description, type, status, reporter_id, created_at, updated_at`,
+    [title, description, type, reporterId],
+  );
+
+  return result.rows[0];
 };
 
 
-const createIssueIntoDB = async (payload: Issue) => {
-  const { title, description, type, reporter_id } = payload;
+const getAllIssuesFromDB = async (query: IIssueQuery) => {
+  const { sort, type, status } = query;
+
+  const sortOrder = sort === "oldest" ? "ASC" : "DESC"; // ✅ correct mapping
+
+  // ✅ build dynamic WHERE clause safely
+  const conditions: string[] = [];
+  const values: string[] = [];
+
+  if (type) {
+    values.push(type);
+    conditions.push(`type = $${values.length}`);
+  }
+  if (status) {
+    values.push(status);
+    conditions.push(`status = $${values.length}`);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const result = await pool.query(
-    `
-      INSERT INTO issues (title, description, type, reporter_id)
-      VALUES ($1,$2,$3,$4)
-      RETURNING id, title, description, type, status, reporter_id, created_at, updated_at
-      `,
-    [title, description, type, reporter_id],
+    `SELECT id, title, description, type, status, reporter_id, created_at, updated_at
+     FROM issues
+     ${whereClause}
+     ORDER BY created_at ${sortOrder}`,
+    values,
   );
-  return result;
-};
-const getAllIssuesFromDB = async (sort: "ASC" | "DESC") => {
-  const result = await pool.query(
-    `
-      SELECT id, title, description, type, status, reporter_id, created_at, updated_at
-      FROM issues
-      ORDER BY created_at ${sort}
-      `,
+
+
+  const issuesWithReporter = await Promise.all(
+    result.rows.map(async (issue) => {
+      const reporter = await getReporterById(issue.reporter_id);
+      const { reporter_id, ...rest } = issue;
+      return { ...rest, reporter };
+    }),
   );
-  return result;
+
+  return issuesWithReporter;
 };
+
 
 const getIssueByIdFromDB = async (id: string) => {
   const result = await pool.query(
-    `
-      SELECT id, title, description, type, status, reporter_id, created_at, updated_at
-      FROM issues
-      WHERE id = $1
-      `,
+    `SELECT id, title, description, type, status, reporter_id, created_at, updated_at
+     FROM issues WHERE id = $1`,
     [id],
   );
-  return result;
+
+  if (result.rows.length === 0) return null;
+
+
+  const issue = result.rows[0];
+  const reporter = await getReporterById(issue.reporter_id);
+  const { reporter_id, ...rest } = issue;
+
+  return { ...rest, reporter };
 };
 
-const updateIssueInDB = async (id: string, payload: Issue) => {
+const updateIssueInDB = async (
+  id: string,
+  payload: Partial<Pick<IIssue, "title" | "description" | "type" | "status">>,
+) => {
   const { title, description, type, status } = payload;
+
   const result = await pool.query(
-    `
-      UPDATE issues
-      SET title = COALESCE($1, title),
-          description = COALESCE($2, description),
-          type = COALESCE($3, type),
-          status = COALESCE($4, status)
-      WHERE id = $5
-      RETURNING id, title, description, type, status, reporter_id, created_at, updated_at
-      `,
+    `UPDATE issues
+     SET title       = COALESCE($1, title),
+         description = COALESCE($2, description),
+         type        = COALESCE($3, type),
+         status      = COALESCE($4, status),
+         updated_at  = NOW()
+     WHERE id = $5
+     RETURNING id, title, description, type, status, reporter_id, created_at, updated_at`,
     [title, description, type, status, id],
   );
-  return result;
+
+  return result.rows[0] ?? null;
 };
 
+// ─── Delete Issue ──────────────────────────────────────────────────
 const deleteIssueFromDB = async (id: string) => {
   const result = await pool.query(
-    `
-      DELETE FROM issues
-      WHERE id = $1
-      RETURNING id
-      `,
+    `DELETE FROM issues WHERE id = $1 RETURNING id`,
     [id],
   );
-  return result;
+
+  return result.rows[0] ?? null; 
 };
 
 export const issueService = {
@@ -87,6 +123,4 @@ export const issueService = {
   getIssueByIdFromDB,
   updateIssueInDB,
   deleteIssueFromDB,
-  createUserIntoDB,
-  
 };
