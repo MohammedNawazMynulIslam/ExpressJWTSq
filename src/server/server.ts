@@ -9,9 +9,25 @@ const PORT = 7000;
 app.use(express.json());
 
 const pool = new Pool({
-  connectionString:
-    "postgresql://neondb_owner:npg_M2Z7RcuCyKoj@ep-proud-shadow-ap0bfj8r-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+  connectionString:process.env.DB_URL,
 });
+
+const initDb = async () => {
+    try { 
+        await pool.query(`
+            
+            
+            `
+
+
+    } catch (error) {
+        console.error("Error initializing database:", error);
+    }
+};
+
+
+
+
 app.get("/", (req: Request, res: Response) => {
   // res.send("Hello World!");
   res.status(200).json({
