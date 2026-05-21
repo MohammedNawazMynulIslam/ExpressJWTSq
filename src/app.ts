@@ -15,7 +15,7 @@ app.use(express.json());
 
 
 // registration user
-app.use("/api/auth/signup", issueRouter);
+app.use("/api/auth", authRouter);
 
 // login user
 app.use("/api/auth", authRouter);

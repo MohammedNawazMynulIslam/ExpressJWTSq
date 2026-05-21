@@ -1,12 +1,13 @@
 import type { Request, Response } from "express";
 import { issueService } from "./issue.servie";
 import type { AuthRequest } from "../../middleware/auth";
+import type { IIssueQuery } from "./issue.interface";
 
 
 
 const createIssue = async (req: AuthRequest, res: Response) => {
   try {
-    const reporterId = req.user!.id; // ✅ from JWT, not body
+    const reporterId = req.user!.id;
     const result = await issueService.createIssueIntoDB(req.body, reporterId);
     res.status(201).json({
       success: true,
@@ -23,14 +24,14 @@ const createIssue = async (req: AuthRequest, res: Response) => {
 };
 const getAllIssues = async (req: Request, res: Response) => {
   
-  const { sort, type, status } = req.query;
+  const query: IIssueQuery = {
+    sort: req.query.sort as string | undefined,
+    type: req.query.type as string | undefined,
+    status: req.query.status as string | undefined,
+  };
 
   try {
-    const result = await issueService.getAllIssuesFromDB({
-      sort,
-      type,
-      status,
-    });
+    const result = await issueService.getAllIssuesFromDB(query);
     res.status(200).json({
       success: true,
       data: result,
