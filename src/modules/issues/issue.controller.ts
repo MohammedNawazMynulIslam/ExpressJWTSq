@@ -53,7 +53,7 @@ const getIssueById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const result = await issueService.getIssueByIdFromDB(String(id));
-    if (result.rows.length === 0) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "Issue not found",
@@ -61,8 +61,8 @@ const getIssueById = async (req: Request, res: Response) => {
     }
     res.status(200).json({
       success: true,
-      message: "Issue retrieved successfully",
-      data: result.rows[0],
+      
+      data: result,
     });
   } catch (error: unknown) {
     res.status(500).json({
@@ -80,7 +80,7 @@ const updateIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.updateIssueInDB(String(id), req.body);
 
-    if (result.rows.length === 0) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "Issue not found",
@@ -89,7 +89,7 @@ const updateIssue = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Issue updated successfully",
-      data: result.rows[0],
+      data: result,
     });
   } catch (error: unknown) {
     res.status(400).json({
@@ -105,7 +105,7 @@ const deleteIssue = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const result = await issueService.deleteIssueFromDB(String(id));
-    if (result.rows.length === 0) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "Issue not found",
@@ -131,6 +131,5 @@ export const issueController = {
   getIssueById,
   updateIssue,
   deleteIssue,
- 
- 
+
 };
