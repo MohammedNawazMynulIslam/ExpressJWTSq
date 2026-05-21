@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { issueController } from "./issues.controller";
+import { issueController } from "./issue.controller";
 import { verifyToken } from "../../middleware/auth"; 
 const router = Router();
 

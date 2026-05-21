@@ -41,30 +41,30 @@ export const initDB = async () => {
     console.error("Error initializing issues table:", error);
   }
 
-  try {
-    await pool.query(`
-            CREATE OR REPLACE FUNCTION set_updated_at()
-            RETURNS TRIGGER AS $$
-            BEGIN
-                NEW.updated_at = NOW();
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
+  // try {
+  //   await pool.query(`
+  //           CREATE OR REPLACE FUNCTION set_updated_at()
+  //           RETURNS TRIGGER AS $$
+  //           BEGIN
+  //               NEW.updated_at = NOW();
+  //               RETURN NEW;
+  //           END;
+  //           $$ LANGUAGE plpgsql;
 
-            DROP TRIGGER IF EXISTS set_users_updated_at ON users;
-            CREATE TRIGGER set_users_updated_at
-            BEFORE UPDATE ON users
-            FOR EACH ROW
-            EXECUTE FUNCTION set_updated_at();
+  //           DROP TRIGGER IF EXISTS set_users_updated_at ON users;
+  //           CREATE TRIGGER set_users_updated_at
+  //           BEFORE UPDATE ON users
+  //           FOR EACH ROW
+  //           EXECUTE FUNCTION set_updated_at();
 
-            DROP TRIGGER IF EXISTS set_issues_updated_at ON issues;
-            CREATE TRIGGER set_issues_updated_at
-            BEFORE UPDATE ON issues
-            FOR EACH ROW
-            EXECUTE FUNCTION set_updated_at();
-        `);
-    console.log("Timestamp triggers initialized successfully");
-  } catch (error) {
-    console.error("Error initializing timestamp triggers:", error);
-  }
+  //           DROP TRIGGER IF EXISTS set_issues_updated_at ON issues;
+  //           CREATE TRIGGER set_issues_updated_at
+  //           BEFORE UPDATE ON issues
+  //           FOR EACH ROW
+  //           EXECUTE FUNCTION set_updated_at();
+  //       `);
+  //   console.log("Timestamp triggers initialized successfully");
+  // } catch (error) {
+  //   console.error("Error initializing timestamp triggers:", error);
+  // }
 };

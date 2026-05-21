@@ -12,7 +12,7 @@ const getReporterById = async (reporterId: number) => {
 
 const createIssueIntoDB = async (
   payload: Pick<IIssue, "title" | "description" | "type">,
-  reporterId: number, // ✅ comes from JWT, not body
+  reporterId: number,
 ) => {
   const { title, description, type } = payload;
 
@@ -107,7 +107,7 @@ const updateIssueInDB = async (
   return result.rows[0] ?? null;
 };
 
-// ─── Delete Issue ──────────────────────────────────────────────────
+
 const deleteIssueFromDB = async (id: string) => {
   const result = await pool.query(
     `DELETE FROM issues WHERE id = $1 RETURNING id`,
