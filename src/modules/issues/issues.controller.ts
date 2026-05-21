@@ -1,10 +1,50 @@
 import type { Request, Response } from "express";
-import { pool } from "../../db";
 import { issueService } from "./issue.servie";
 
+const createUser = async (req: Request, res: Response) => {
+  try {
+    const result = await issueService.createUserIntoDB(req.body);
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: result.rows[0],
+    });
+  } catch (error: unknown) {
+    res.status(400).json({
+      success: true,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error,
+    });
+  }
+};
+const loginUser = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  try {
+    const result = await issueService.loginUserFromDB(email, password);
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: result.rows[0],
+    });
+  } catch (error: unknown) {
+    res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      error: error,
+    });
+  }
+};
 const createIssue = async (req: Request, res: Response) => {
   try {
-   const result = await issueService.createIssueIntoDB(req.body);
+    const result = await issueService.createIssueIntoDB(req.body);
     res.status(201).json({
       success: true,
       message: "Issue created successfully",
@@ -66,12 +106,10 @@ const getIssueById = async (req: Request, res: Response) => {
 
 const updateIssue = async (req: Request, res: Response) => {
   const { id } = req.params;
-  
+
   try {
-      const result = await issueService.updateIssueInDB(String(id), 
-         req.body
-      );
-        
+    const result = await issueService.updateIssueInDB(String(id), req.body);
+
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -116,10 +154,13 @@ const deleteIssue = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const issueController = {
   createIssue,
   getAllIssues,
   getIssueById,
   updateIssue,
   deleteIssue,
+  createUser,
+  loginUser,
 };

@@ -2,7 +2,8 @@ import { Router } from "express";
 import { issueController } from "./issues.controller";
 
 const router = Router();
-
+router.post("/", issueController.createUser);
+router.post("/", issueController.loginUser);
 router.post("/", issueController.createIssue);
 router.get("/", issueController.getAllIssues);
 router.get("/:id", issueController.getIssueById);
