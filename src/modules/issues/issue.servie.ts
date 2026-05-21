@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-import type { IIssue, IIssueQuery, IssueRequester } from "./issue.interface";
-import { AppError } from "../../utils/appError";
-import { query as runQuery } from "../../utils/dbQuery";
+import { AppError } from "../../utils/appError.js";
+import { query as runQuery } from "../../utils/dbQuery.js";
+import type { IIssue, IIssueQuery, IssueRequester } from "./issue.interface.js";
 
 type ReporterRow = Pick<IIssue, "id" | "name" | "role">;
 

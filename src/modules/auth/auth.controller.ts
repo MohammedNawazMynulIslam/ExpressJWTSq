@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { getErrorMessage } from "../../utils/appError";
+import { getErrorMessage } from "../../utils/appError.js";
 import {
   sendErrorResponse,
   sendSuccessResponse,
-} from "../../utils/sendResponse";
-import { authService } from "./auth.service";
+} from "../../utils/sendResponse.js";
+import { authService } from "./auth.service.js";
 
 type RegisterUserBody = {
   name: string;

@@ -1,13 +1,13 @@
 import type { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import type { AuthRequest } from "../../middleware/auth";
-import { getErrorMessage, getErrorStatusCode } from "../../utils/appError";
+import type { AuthRequest } from "../../middleware/auth.js";
+import { getErrorMessage, getErrorStatusCode } from "../../utils/appError.js";
 import {
   sendErrorResponse,
   sendSuccessResponse,
-} from "../../utils/sendResponse";
-import type { IIssue, IIssueQuery } from "./issue.interface";
-import { issueService } from "./issue.servie";
+} from "../../utils/sendResponse.js";
+import type { IIssue, IIssueQuery } from "./issue.interface.js";
+import { issueService } from "./issue.servie.js";
 
 type IssueIdParams = {
   id: string;

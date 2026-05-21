@@ -4,7 +4,9 @@ A RESTful issue tracking API built with Express, TypeScript, PostgreSQL, and JWT
 
 ## Live URL
 
-Not deployed yet.
+```text
+https://express-js-jwts-ql.vercel.app
+```
 
 Local development URL:
 
@@ -61,6 +63,39 @@ npm run dev
 ```
 
 4. The database tables are initialized automatically when the server starts.
+
+## Deploy to Vercel
+
+1. Push the project to GitHub.
+
+2. Create a PostgreSQL database on a hosted provider such as Neon, Supabase, or Railway.
+
+3. Import the GitHub repository into Vercel.
+
+4. Add these environment variables in Vercel project settings:
+
+```env
+DB_URL=your_hosted_postgresql_connection_string
+JWT_SECRET=your_jwt_secret
+```
+
+`PORT` is not required on Vercel because Vercel manages the serverless runtime.
+
+5. Deploy the project.
+
+The Vercel serverless entrypoint is:
+
+```text
+api/index.ts
+```
+
+The routing configuration is stored in:
+
+```text
+vercel.json
+```
+
+After deployment, replace the "Live URL" section above with your Vercel production URL.
 
 ## API Endpoints
 

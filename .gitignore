@@ -19,3 +19,4 @@ build
 # Environment variables
 .env
 .env.*
+.vercel

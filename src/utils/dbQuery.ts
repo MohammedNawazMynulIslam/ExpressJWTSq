@@ -1,5 +1,5 @@
 import type { QueryResult, QueryResultRow } from "pg";
-import { pool } from "../db";
+import { pool } from "../db/index.js";
 
 export const query = async <T extends QueryResultRow>(
   text: string,

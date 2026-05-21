@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { issueController } from "./issue.controller";
-import { verifyToken } from "../../middleware/auth"; 
+import { verifyToken } from "../../middleware/auth.js";
+import { issueController } from "./issue.controller.js";
 const router = Router();
 
 router.post("/", verifyToken, issueController.createIssue);

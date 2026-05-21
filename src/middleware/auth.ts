@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
-import { config } from "../config";
-import { sendErrorResponse } from "../utils/sendResponse";
+import { config } from "../config/index.js";
+import { sendErrorResponse } from "../utils/sendResponse.js";
 
 export type AuthUser = {
   id: number;

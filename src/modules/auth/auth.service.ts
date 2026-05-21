@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
-import { config } from "../../config";
-import { AppError } from "../../utils/appError";
-import { query } from "../../utils/dbQuery";
+import { config } from "../../config/index.js";
+import { AppError } from "../../utils/appError.js";
+import { query } from "../../utils/dbQuery.js";
 
 type UserRole = "contributor" | "maintainer";
 
