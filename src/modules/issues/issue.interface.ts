@@ -14,8 +14,6 @@ export interface IIssue {
   role?: "contributor" | "maintainer";
 }
 
-
-// issue.interface.ts
 export interface IIssueQuery {
   sort?: "newest" | "oldest" | undefined;
   type?: "bug" | "feature_request" | undefined;
